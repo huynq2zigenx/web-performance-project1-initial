@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    
+    environment {
+        // FIREBASE_PROJECT = credentials('firebase-project-id')
+        // GOOGLE_APPLICATION_CREDENTIALS = credentials('firebase-service-account-key')
+    }
+    
+    triggers {
+        githubPush()
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo "checkout..."
+                }
+                
+                // Checkout source code from main branch
+                checkout scm
+                
+                script {
+                    // Get commit information for notifications
+                    env.GIT_COMMIT_MSG = sh(
+                        script: 'git log -1 --pretty=%B',
+                        returnStdout: true
+                    ).trim()
+                    env.GIT_AUTHOR = sh(
+                        script: 'git log -1 --pretty=%an',
+                        returnStdout: true
+                    ).trim()
+                    env.GIT_COMMIT_SHORT = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                }
+                
+                echo "✅ Checkout completed successfully"
+            }
+        }
+        
+ }
+}
