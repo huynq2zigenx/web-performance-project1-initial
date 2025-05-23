@@ -100,7 +100,7 @@ pipeline {
                 echo "Deployment SUCCESS! Sending email notification..."
                 
                 emailext (
-                    subject: "✅ Firebase Deploy Success - ${FIREBASE_PROJECT}",
+                    subject: "✅ Firebase Deploy Success",
                     body: """
                         <h2 style="color: #28a745;">🎉 Firebase Deployment Successful!</h2>
                     """,
@@ -115,7 +115,7 @@ pipeline {
                 echo "Deployment FAILED! Sending email notification..."
                 
                 emailext (
-                    subject: "❌ Firebase Deploy Failed - ${FIREBASE_PROJECT}",
+                    subject: "❌ Firebase Deploy Failed",
                     body: """
                         <h2 style="color: #dc3545;">❌ Firebase Deployment Failed!</h2>
                     """,
