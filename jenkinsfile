@@ -39,7 +39,38 @@ pipeline {
                 echo "✅ Checkout completed successfully"
             }
         }
-
+        
+        stage('Setup Firebase') {
+            steps {
+                script {
+                    echo "🔧 Setting up Firebase CLI..."
+                }
+                
+                // Install Firebase CLI and dependencies
+                sh '''
+                    # Update package manager
+                    sudo apt-get update
+                    
+                    # Install Python3 and pip if not available
+                    sudo apt-get install python3-pip -y
+                    
+                    # Install Node.js 18.x
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo bash -
+                    sudo apt-get install -y nodejs
+                    
+                    # Install Firebase CLI globally
+                    sudo npm install -g firebase-tools
+                    
+                    # Verify installations
+                    node --version
+                    npm --version
+                    firebase --version
+                '''
+                
+                echo "✅ Firebase CLI setup completed"
+            }
+        }
+        
         stage('Deploy') {
             steps {
                 script {
@@ -61,8 +92,9 @@ pipeline {
                 }
             }
         }
-
-        post {
+    }
+    
+    post {
         success {
             script {
                 echo "Deployment SUCCESS! Sending email notification..."
@@ -70,7 +102,7 @@ pipeline {
                 emailext (
                     subject: "✅ Firebase Deploy Success - ${FIREBASE_PROJECT}",
                     body: """
-                       deployed 
+                        <h2 style="color: #28a745;">🎉 Firebase Deployment Successful!</h2>
                     """,
                     mimeType: 'text/html',
                     to: '${DEFAULT_RECIPIENTS}'
@@ -85,7 +117,7 @@ pipeline {
                 emailext (
                     subject: "❌ Firebase Deploy Failed - ${FIREBASE_PROJECT}",
                     body: """
-                        deploy failed
+                        <h2 style="color: #dc3545;">❌ Firebase Deployment Failed!</h2>
                     """,
                     mimeType: 'text/html',
                     to: '${DEFAULT_RECIPIENTS}'
@@ -101,6 +133,4 @@ pipeline {
             cleanWs()
         }
     }
-        
- }
 }
