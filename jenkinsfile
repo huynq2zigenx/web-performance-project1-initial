@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    environment {
+        FIREBASE_PROJECT = credentials('firebase-project-id')
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('firebase-service-account-key')
+    }
+    
     stages {
         stage('Checkout') {
             steps {
