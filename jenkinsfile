@@ -6,6 +6,10 @@ pipeline {
         GOOGLE_APPLICATION_CREDENTIALS = credentials('firebase-service-account-key')
     }
     
+    triggers {
+        githubPush()
+    }
+    
     stages {
         stage('Checkout') {
             steps {
@@ -33,6 +37,31 @@ pipeline {
                 }
                 
                 echo "✅ Checkout completed successfully"
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    echo "Starting deployment to Firebase Hosting..."
+                    echo "Target project: ${FIREBASE_PROJECT}"
+                }
+                
+                // Deploy to Firebase Hosting
+                sh '''
+                    # Set Google Application Credentials
+                    export GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}
+                    
+                    # Authenticate with Firebase (non-interactive)
+                    firebase login:ci --interactive false || echo "Already authenticated"
+                    
+                    # Deploy to Firebase Hosting
+                    firebase deploy --only hosting --project=${FIREBASE_PROJECT} --non-interactive
+                '''
+                
+                script {
+                    echo "Deployment completed successfully!"
+                }
             }
         }
         
